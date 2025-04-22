@@ -1,15 +1,20 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaArrowRight } from "react-icons/fa";
+import {
+  FaArrowRight,
+  FaFacebookF,
+  FaTwitter,
+  FaInstagram,
+  FaLinkedinIn,
+} from "react-icons/fa";
 import socialmedia_image from "../image/socialmedia_img.svg";
-import Footer from "../components/Footer";
 
 const LandingPage = () => {
-    const navigate = useNavigate();
-  
-    const goToSignup = () => {
-      navigate("/signup");
-    };
+  const navigate = useNavigate();
+
+  const goToSignup = () => {
+    navigate("/signup");
+  };
   const features = [
     {
       id: 1,
@@ -44,12 +49,16 @@ const LandingPage = () => {
         <div className="flex flex-col-reverse lg:flex-row items-center gap-16">
           <div className="lg:w-1/2 text-center lg:text-left">
             <h1 className="text-5xl font-extrabold text-indigo-800 leading-tight mb-2">
-            Connecting Hearts, Inspiring Stories
+              Connecting Hearts, Inspiring Stories
             </h1>
             <p className="mt-6 text-gray-600 text-lg">
-              Connectify is a dynamic social media application that connects people around the world through posts, likes, comments, and real-time messaging.
+              Connectify is a dynamic social media application that connects
+              people around the world through posts, likes, comments, and
+              real-time messaging.
             </p>
-            <button onClick={goToSignup} className="mt-8 px-8 py-4 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 flex items-center gap-3 mx-auto lg:mx-0"
+            <button
+              onClick={goToSignup}
+              className="mt-8 px-8 py-4 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 flex items-center gap-3 mx-auto lg:mx-0"
             >
               Get started with Connectify <FaArrowRight />
             </button>
@@ -86,7 +95,6 @@ const LandingPage = () => {
                   {feature.title}
                 </h3>
                 <p className="mt-3 text-gray-500 text-sm">{feature.desc}</p>
-                
               </div>
             ))}
           </div>
@@ -94,6 +102,121 @@ const LandingPage = () => {
       </div>
       <Footer />
     </div>
+  );
+};
+
+// footer section
+const Footer = () => {
+  return (
+    <>
+      <footer className="relative bg-gradient-to-br from-indigo-900 to-purple-800 text-white pt-28 pb-10 mt-32 overflow-hidden">
+        <div className="absolute top-0 left-0 w-full opacity-95">
+          <svg
+            className="w-full h-24 md:h-32 fill-current text-white"
+            viewBox="0 0 1440 320"
+            preserveAspectRatio="none"
+          >
+            <path d="M0,224L48,208C96,192,192,160,288,160C384,160,480,192,576,197.3C672,203,768,181,864,176C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+          </svg>
+        </div>
+        
+        <div className="relative z-10 max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
+          <div className="lg:col-span-2">
+            <h2 className="text-3xl font-bold mb-4 text-white">Connectify</h2>
+            <p className="text-purple-200 leading-relaxed">
+              A collaborative platform that simplifies payroll and expense
+              claims, with a beautiful, easy-to-use interface.
+            </p>
+          </div>
+          
+          {/* Company Links */}
+          <div>
+            <h3 className="text-xl font-semibold mb-4">Company</h3>
+            <ul className="space-y-3 text-purple-200">
+              <li>
+                <a href="#" className="hover:text-white transition">
+                  About Us
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-white transition">
+                  Careers
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-white transition">
+                  Blog
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-white transition">
+                  Contact
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Resources */}
+          <div>
+            <h3 className="text-xl font-semibold mb-4">Resources</h3>
+            <ul className="space-y-3 text-purple-200">
+              <li>
+                <a href="#" className="hover:text-white transition">
+                  Help Center
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-white transition">
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-white transition">
+                  Terms of Service
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Newsletter */}
+          <div>
+            <h3 className="text-xl font-semibold mb-4">Subscribe</h3>
+            <p className="text-purple-200 mb-3 text-sm">
+              Get the latest updates and offers.
+            </p>
+            <form className="flex flex-col space-y-3">
+              <input
+                type="email"
+                placeholder="Your email"
+                className="px-4 py-2 rounded-lg bg-white text-black placeholder-gray-500 outline-none"
+              />
+              <button className="bg-white text-indigo-800 font-semibold py-2 rounded-lg hover:bg-purple-100 transition">
+                Subscribe
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {/* Footer Bottom */}
+        <div className="relative z-10 border-t border-purple-700 mt-10 pt-6 px-6 flex flex-col lg:flex-row items-center justify-between max-w-7xl mx-auto text-sm text-purple-200">
+          <p>© {new Date().getFullYear()} Connectify. All rights reserved.</p>
+          <div className="flex space-x-4 mt-4 lg:mt-0">
+            <a href="#" className="hover:text-white">
+              <FaFacebookF />
+            </a>
+            <a href="#" className="hover:text-white">
+              <FaTwitter />
+            </a>
+            <a href="#" className="hover:text-white">
+              <FaInstagram />
+            </a>
+            <a href="#" className="hover:text-white">
+              <FaLinkedinIn />
+            </a>
+          </div>
+        </div>
+      </footer>
+    </>
   );
 };
 

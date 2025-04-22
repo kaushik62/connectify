@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import MainPage from "./Pages/MainPage";
+import MainPage, { RightSidebar } from "./Pages/MainPage";
 import Signup from "./Pages/Signup";
 import Login from "./Pages/Login";
 import Header from "./components/Header";
@@ -8,6 +8,7 @@ import LandingPage from "./Pages/LandingPage";
 import MyPosts from "./components/MyPosts";
 import MyProfile from "./components/MyProfile";
 import EditMyProfile from "./components/EditMyProfile";
+import Page_Not_Found from "./Pages/Page_Not_Found";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -38,6 +39,7 @@ function App() {
           )}
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/*" element={<Page_Not_Found/>} />
           <Route path="/edit-my-profile" element={<EditMyProfile />} />
           
           <Route
@@ -45,7 +47,7 @@ function App() {
             element={
               <>
                 <div className="flex-1 space-y-4 mx-4 mt-20">
-                  <MyProfile/>
+                  <MyProfile />
                   <MyPosts />
                 </div>
               </>

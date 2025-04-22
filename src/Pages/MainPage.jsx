@@ -125,7 +125,7 @@ const CenterArea = () => {
 };
 
 //* right sidebar or follow suggestions
-const RightSidebar = () => (
+export const RightSidebar = () => (
   <aside className="w-1/4 space-y-4">
     <div className="bg-white p-4 rounded-lg shadow-md">
       <h3 className="font-bold mb-2">Suggested For You</h3>
@@ -133,6 +133,9 @@ const RightSidebar = () => (
     </div>
   </aside>
 );
+
+
+
 
 function MainPage() {
   return (
