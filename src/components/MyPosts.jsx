@@ -25,21 +25,30 @@ const MyPosts = () => {
     fetchPosts();
   }, [userId]);
 
-  const handlePostClick = (postId, userId) => {
-    alert(`Post ID: ${postId}\nUser ID: ${userId}`);
-  };
+  // const handlePostClick = (postId, userId) => {
+  //   alert(`Post ID: ${postId}\nUser ID: ${userId}`);
+  // };
+  const [profile, setProfile] = useState({});
+  const currentUserId = decoded.id || decoded._id || decoded.userId;
 
+  useEffect(() => {
+    axios
+      .get(`${BASE_URL}/auth/profile/${currentUserId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => setProfile(res.data))
+      .catch((err) => console.error("Error fetching profile:", err));
+  }, []);
   return (
     <div className="bg-grey-100 w-[72%] ml-auto p-1 absolute top-11 right-5 pt-5">
       <h2 className="text-gray-600 text-xl my-4">My Posts</h2>
       <div className="p-0.5 max-w-3xl mx-auto -mt-3">
         {posts.map((post, index) => (
-          <div
-            key={index}
-            onClick={() => handlePostClick(post.postId, post.user.id)}
-            className="cursor-pointer"
-          >
+          <div key={index} className="cursor-pointer">
             <Post
+              currentUserimg={profile.url}
               userImg={post.user.url}
               username={post.user.username}
               timeAgo={post.time}
@@ -49,6 +58,8 @@ const MyPosts = () => {
               postImg={post.postUrl}
               likes={post.noOfLikes}
               comments={post.noOfComments}
+              postId={post.postId}
+              userId={post.user.id}
             />
           </div>
         ))}

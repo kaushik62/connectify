@@ -1,66 +1,64 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import BASE_URL from "../config";
+import { jwtDecode } from "jwt-decode";
 
 const Follower_Following_list = () => {
-  const [followers] = useState([
-    {
-      name: 'Claire Kumas',
-      img: 'https://storage.googleapis.com/a1aa/image/P6ALr6jEE5Q1Ys00MRG8Uomg6hn2SWOw2B_LkPaFRrU.jpg',
-    },
-    {
-      name: 'Blair Dota',
-      img: 'https://storage.googleapis.com/a1aa/image/_jjIEtUnwCbhcd4qn9gFHVSn30LcOHgycTtrVsoMIEk.jpg',
-    },
-    {
-      name: 'Claire Kumas',
-      img: 'https://storage.googleapis.com/a1aa/image/P6ALr6jEE5Q1Ys00MRG8Uomg6hn2SWOw2B_LkPaFRrU.jpg',
-    },
-    {
-      name: 'Blair Dota',
-      img: 'https://storage.googleapis.com/a1aa/image/_jjIEtUnwCbhcd4qn9gFHVSn30LcOHgycTtrVsoMIEk.jpg',
-    },
-    {
-      name: 'Claire Kumas',
-      img: 'https://storage.googleapis.com/a1aa/image/P6ALr6jEE5Q1Ys00MRG8Uomg6hn2SWOw2B_LkPaFRrU.jpg',
-    },
-    {
-      name: 'Blair Dota',
-      img: 'https://storage.googleapis.com/a1aa/image/_jjIEtUnwCbhcd4qn9gFHVSn30LcOHgycTtrVsoMIEk.jpg',
-    },
-  ]);
-
-  const [following, setFollowing] = useState([
-    {
-      name: 'Luna Roy',
-      img: 'https://randomuser.me/api/portraits/women/65.jpg',
-    },
-    {
-      name: 'Ethan Nova',
-      img: 'https://randomuser.me/api/portraits/men/64.jpg',
-    },
-    {
-      name: 'Luna Roy',
-      img: 'https://randomuser.me/api/portraits/women/65.jpg',
-    },
-    {
-      name: 'Ethan Nova',
-      img: 'https://randomuser.me/api/portraits/men/64.jpg',
-    },
-    {
-      name: 'Luna Roy',
-      img: 'https://randomuser.me/api/portraits/women/65.jpg',
-    },
-    {
-      name: 'Ethan Nova',
-      img: 'https://randomuser.me/api/portraits/men/64.jpg',
-    },
-  ]);
-
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
   const [showFollowers, setShowFollowers] = useState(true);
+  const token = localStorage.getItem("token");
+  let currentUserId = null;
 
-  const handleRemove = (index) => {
-    const updated = [...following];
-    updated.splice(index, 1);
-    setFollowing(updated);
+  try {
+    if (token) {
+      const decoded = jwtDecode(token);
+      currentUserId = decoded?.id || decoded?._id || decoded?.userId;
+    }
+  } catch (err) {
+    console.error("Invalid token:", err);
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!currentUserId || !token) return;
+
+      try {
+        const [followersRes, followingRes] = await Promise.all([
+          axios.get(`${BASE_URL}/api/followers/${currentUserId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${BASE_URL}/api/following/${currentUserId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        // Update state with raw array response
+        setFollowers(Array.isArray(followersRes.data) ? followersRes.data : []);
+        setFollowing(Array.isArray(followingRes.data) ? followingRes.data : []);
+      } catch (error) {
+        console.error("Error fetching followers/following:", error);
+      }
+    };
+
+    fetchData();
+  }, [currentUserId, token]);
+
+  const handleRemove = async (index, toUserId) => {
+    try {
+      await axios.delete(
+        `${BASE_URL}/api/unfollow?fromUserId=${currentUserId}&toUserId=${toUserId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const updated = [...following];
+      updated.splice(index, 1);
+      setFollowing(updated);
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+    }
   };
 
   const users = showFollowers ? followers : following;
@@ -71,7 +69,9 @@ const Follower_Following_list = () => {
       <div className="flex justify-center gap-4 mt-6">
         <button
           className={`px-4 py-2 rounded-full text-sm font-medium ${
-            showFollowers ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
+            showFollowers
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-800"
           }`}
           onClick={() => setShowFollowers(true)}
         >
@@ -79,7 +79,9 @@ const Follower_Following_list = () => {
         </button>
         <button
           className={`px-4 py-2 rounded-full text-sm font-medium ${
-            !showFollowers ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
+            !showFollowers
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-800"
           }`}
           onClick={() => setShowFollowers(false)}
         >
@@ -89,7 +91,7 @@ const Follower_Following_list = () => {
 
       {/* Heading */}
       <h1 className="text-xl font-semibold mt-6 mb-2 text-center">
-        {showFollowers ? 'My Followers List' : 'My Following List'}
+        {showFollowers ? "My Followers List" : "My Following List"}
       </h1>
 
       {/* Scrollable List */}
@@ -104,19 +106,22 @@ const Follower_Following_list = () => {
             >
               <div className="flex items-center">
                 <img
-                  src={user.img}
-                  alt={`Profile picture of ${user.name}`}
-                  className="w-12 h-12 rounded-full"
+                  src={user.url}
+                  alt={`Profile of ${user.username}`}
+                  className="w-12 h-12 rounded-full object-cover"
                 />
                 <div className="ml-4">
-                  <div className="text-lg font-semibold">{user.name}</div>
+                  <div className="text-lg font-semibold">{user.username}</div>
+                  {user.userBio && (
+                    <p className="text-sm text-gray-600">{user.userBio}</p>
+                  )}
                 </div>
               </div>
 
               {!showFollowers && (
                 <button
-                  onClick={() => handleRemove(index)}
-                  className="text-white hover:bg-pink-700 text-sm bg-pink-600 px-3.5 rounded-full py-1.5 transition duration-200 ease-in-out"
+                  onClick={() => handleRemove(index, user._id)}
+                  className="text-white bg-pink-600 hover:bg-pink-700 text-sm px-3.5 py-1.5 rounded-full transition duration-200"
                 >
                   Unfollow
                 </button>

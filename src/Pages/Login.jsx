@@ -60,7 +60,6 @@ const Login = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
-    const expiration = localStorage.getItem("expirationTimestamp");
 
     if (token && expiration) {
       const remainingTime = parseInt(expiration) - Date.now();
