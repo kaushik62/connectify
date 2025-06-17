@@ -3,10 +3,11 @@ import axios from "axios";
 import BASE_URL from "../config";
 import { jwtDecode } from "jwt-decode";
 
-const Follower_Following_list = () => {
+const Follower_Following_list = ({ onChange }) => {
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [showFollowers, setShowFollowers] = useState(true);
+
   const token = localStorage.getItem("token");
   let currentUserId = null;
 
@@ -19,28 +20,26 @@ const Follower_Following_list = () => {
     console.error("Invalid token:", err);
   }
 
+  const fetchData = async () => {
+    if (!currentUserId || !token) return;
+    try {
+      const [followersRes, followingRes] = await Promise.all([
+        axios.get(`${BASE_URL}/api/followers/${currentUserId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get(`${BASE_URL}/api/following/${currentUserId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+
+      setFollowers(Array.isArray(followersRes.data) ? followersRes.data : []);
+      setFollowing(Array.isArray(followingRes.data) ? followingRes.data : []);
+    } catch (error) {
+      console.error("Error fetching followers/following:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      if (!currentUserId || !token) return;
-
-      try {
-        const [followersRes, followingRes] = await Promise.all([
-          axios.get(`${BASE_URL}/api/followers/${currentUserId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`${BASE_URL}/api/following/${currentUserId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-
-        // Update state with raw array response
-        setFollowers(Array.isArray(followersRes.data) ? followersRes.data : []);
-        setFollowing(Array.isArray(followingRes.data) ? followingRes.data : []);
-      } catch (error) {
-        console.error("Error fetching followers/following:", error);
-      }
-    };
-
     fetchData();
   }, [currentUserId, token]);
 
@@ -56,6 +55,8 @@ const Follower_Following_list = () => {
       const updated = [...following];
       updated.splice(index, 1);
       setFollowing(updated);
+
+      if (typeof onChange === "function") onChange();
     } catch (error) {
       console.error("Error unfollowing user:", error);
     }
@@ -101,7 +102,7 @@ const Follower_Following_list = () => {
         ) : (
           users.map((user, index) => (
             <div
-              key={index}
+              key={user.id || index}
               className="flex justify-between items-center p-4 border-b border-gray-200"
             >
               <div className="flex items-center">
@@ -120,7 +121,7 @@ const Follower_Following_list = () => {
 
               {!showFollowers && (
                 <button
-                  onClick={() => handleRemove(index, user._id)}
+                  onClick={() => handleRemove(index, user.id || user._id)}
                   className="text-white bg-pink-600 hover:bg-pink-700 text-sm px-3.5 py-1.5 rounded-full transition duration-200"
                 >
                   Unfollow

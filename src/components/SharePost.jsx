@@ -4,7 +4,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import BASE_URL from "../config";
 
-const SharePost = ({ onClose }) => {
+const SharePost = ({ onClose, onPostSubmit }) => {
   const [postText, setPostText] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [profile, setProfile] = useState({});
@@ -36,7 +36,7 @@ const SharePost = ({ onClose }) => {
 
   const handleRemoveImage = () => {
     setSelectedImage(null);
-    fileInputRef.current.value = null;
+    if (fileInputRef.current) fileInputRef.current.value = null;
   };
 
   const uploadToCloudinary = async (file) => {
@@ -56,7 +56,7 @@ const SharePost = ({ onClose }) => {
     if (!postText.trim()) return;
 
     setIsPosting(true);
-    setSuccessMessage("Posting wait...");
+    setSuccessMessage("Posting...");
 
     try {
       let imageUrl = "";
@@ -66,7 +66,7 @@ const SharePost = ({ onClose }) => {
       }
 
       const postData = {
-        postUrl: imageUrl, // Will be empty string if no image
+        postUrl: imageUrl,
         postDescription: postText,
       };
 
@@ -81,13 +81,18 @@ const SharePost = ({ onClose }) => {
       handleRemoveImage();
       setSuccessMessage("Post successfully ✔️");
 
+      // ✅ Notify parent to refresh Feed
+      if (onPostSubmit) {
+        onPostSubmit();
+      }
+
       setTimeout(() => {
         setSuccessMessage("");
         onClose();
-      }, 1500);
+      }, 1200);
     } catch (error) {
       console.error("Error posting:", error);
-      alert("Failed to post");
+      setSuccessMessage("Something went wrong ❌");
     } finally {
       setIsPosting(false);
     }
@@ -96,16 +101,15 @@ const SharePost = ({ onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50">
       <div className="bg-white w-[700px] min-h-[480px] rounded-xl shadow-2xl p-6">
+        {/* Header */}
         <div className="flex justify-between items-center border-b pb-4">
           <div className="flex items-center gap-3">
             <img
               src={profile.url}
               alt="Profile"
-              className="w-15 h-15 rounded-full"
+              className="w-12 h-12 rounded-full"
             />
-            <div>
-              <p className="font-semibold text-xl">{profile.username}</p>
-            </div>
+            <p className="font-semibold text-xl">{profile.username}</p>
           </div>
           <button
             onClick={onClose}
@@ -115,7 +119,7 @@ const SharePost = ({ onClose }) => {
           </button>
         </div>
 
-        {/* Text Area */}
+        {/* Text Input */}
         <textarea
           className="w-full h-60 mt-5 text-lg placeholder-gray-500 outline-none resize-none"
           placeholder="What do you want to talk about?"
@@ -128,7 +132,7 @@ const SharePost = ({ onClose }) => {
           <div className="relative mt-4">
             <img
               src={URL.createObjectURL(selectedImage)}
-              alt="Uploaded"
+              alt="Selected"
               className="w-full max-h-60 object-contain rounded-md border"
             />
             <button
@@ -140,7 +144,7 @@ const SharePost = ({ onClose }) => {
           </div>
         )}
 
-        {/* Bottom Section */}
+        {/* Actions */}
         <div className="flex flex-col items-end mt-6">
           {successMessage && (
             <p
@@ -151,6 +155,7 @@ const SharePost = ({ onClose }) => {
               {successMessage}
             </p>
           )}
+
           <div className="flex gap-5 items-center w-full justify-between">
             <div className="flex gap-5 text-gray-500">
               <button onClick={handleImageClick} className="hover:text-black">
@@ -164,6 +169,7 @@ const SharePost = ({ onClose }) => {
                 className="hidden"
               />
             </div>
+
             <button
               className={`px-6 py-2 rounded-full font-medium transition ${
                 postText.trim()

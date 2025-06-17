@@ -8,22 +8,18 @@ import MyProfile from "../components/MyProfile";
 import ShowUserId from "../components/Demo";
 import { jwtDecode } from "jwt-decode";
 
-//* share something
-const ShareSomething = () => {
+//* Share something input
+const ShareSomething = ({ onPostSubmit }) => {
   const [showSharePost, setShowSharePost] = useState(false);
-  
+  const [profile, setProfile] = useState({});
   const token = localStorage.getItem("token");
   const decoded = jwtDecode(token);
   const userId = decoded.id || decoded._id || decoded.userId;
-  
-  const [profile, setProfile] = useState({});
 
   useEffect(() => {
     axios
       .get(`${BASE_URL}/auth/profile/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setProfile(res.data))
       .catch((err) => console.error("Error fetching profile:", err));
@@ -35,7 +31,7 @@ const ShareSomething = () => {
         <div className="flex items-center space-x-4">
           <img
             src={profile.url}
-            alt="User profile picture"
+            alt="User profile"
             className="rounded-full"
             width="40"
             height="40"
@@ -47,9 +43,11 @@ const ShareSomething = () => {
             onClick={() => setShowSharePost(true)}
             readOnly
           />
-
           {showSharePost && (
-            <SharePost onClose={() => setShowSharePost(false)} />
+            <SharePost
+              onClose={() => setShowSharePost(false)}
+              onPostSubmit={onPostSubmit} // ✅ pass refresh callback
+            />
           )}
         </div>
       </div>
@@ -57,12 +55,15 @@ const ShareSomething = () => {
   );
 };
 
-//* feed
-const Feed = () => {
+//* Feed component
+const Feed = ({ refresh }) => {
   const [posts, setPosts] = useState([]);
+  const [profile, setProfile] = useState({});
+  const token = localStorage.getItem("token");
+  const decoded = jwtDecode(token);
+  const currentUserId = decoded.id || decoded._id || decoded.userId;
 
-  useEffect(() => {
-    const token = localStorage.getItem("token"); // Adjust if you store the token differently
+  const fetchPosts = () => {
     axios
       .get(`${BASE_URL}/api/all-post`, {
         headers: {
@@ -70,19 +71,13 @@ const Feed = () => {
           "Content-Type": "application/json",
         },
       })
-      .then((response) => {
-        setPosts(response.data);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch posts:", error);
-      });
-  }, []);
+      .then((response) => setPosts(response.data))
+      .catch((error) => console.error("Failed to fetch posts:", error));
+  };
 
-
-  const [profile, setProfile] = useState({});
-  const token = localStorage.getItem("token");
-  const decoded = jwtDecode(token);
-  const currentUserId = decoded.id || decoded._id || decoded.userId;
+  useEffect(() => {
+    fetchPosts();
+  }, [refresh]);
 
   useEffect(() => {
     axios
@@ -119,20 +114,24 @@ const Feed = () => {
   );
 };
 
-//* center area
+//* Center section: handles refresh state
 const CenterArea = () => {
+  const [refresh, setRefresh] = useState(false);
+
+  const handlePostSubmit = () => {
+    setRefresh((prev) => !prev); // ✅ toggle to trigger Feed re-fetch
+  };
+
   return (
-    <>
-      <div className="flex-1 space-y-4 mx-4">
-        <ShowUserId />
-        <ShareSomething />
-        <Feed />
-      </div>
-    </>
+    <div className="flex-1 space-y-4 mx-4">
+      <ShowUserId />
+      <ShareSomething onPostSubmit={handlePostSubmit} />
+      <Feed refresh={refresh} />
+    </div>
   );
 };
 
-//* right sidebar or follow suggestions
+//* Right sidebar
 export const RightSidebar = () => (
   <aside className="w-1/4 space-y-4">
     <div className="bg-white p-4 rounded-lg shadow-md">
@@ -142,15 +141,14 @@ export const RightSidebar = () => (
   </aside>
 );
 
+//* MainPage layout
 function MainPage() {
   return (
-    <>
-      <div className="flex flex-grow p-4 mt-14 bg-gray-100">
-        <MyProfile />
-        <CenterArea />
-        <RightSidebar />
-      </div>
-    </>
+    <div className="flex flex-grow p-4 mt-14 bg-gray-100">
+      <MyProfile />
+      <CenterArea />
+      <RightSidebar />
+    </div>
   );
 }
 

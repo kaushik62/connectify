@@ -24,10 +24,7 @@ const MyPosts = () => {
 
     fetchPosts();
   }, [userId]);
-
-  // const handlePostClick = (postId, userId) => {
-  //   alert(`Post ID: ${postId}\nUser ID: ${userId}`);
-  // };
+ 
   const [profile, setProfile] = useState({});
   const currentUserId = decoded.id || decoded._id || decoded.userId;
 

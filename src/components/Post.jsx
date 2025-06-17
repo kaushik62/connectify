@@ -2,13 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import BASE_URL from "../config";
 import { X } from "lucide-react";
-import { FaHeart, FaComment } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { jwtDecode } from "jwt-decode";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FaHeart, FaRegHeart, FaComment } from "react-icons/fa";
 
-// Post component
 const Post = ({
   currentUserimg,
   userImg,
@@ -27,7 +26,8 @@ const Post = ({
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [likesCount, setLikesCount] = useState(0);
-
+  const [isLiked, setIsLiked] = useState(false);
+  const [posts, setPosts] = useState([]);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -36,33 +36,21 @@ const Post = ({
         const decoded = jwtDecode(token);
         const uid = decoded.id || decoded._id || decoded.userId;
         setCurrentUserId(uid);
-        fetchLikesStatus(uid);
       } catch (err) {
         console.error("Error decoding token", err);
       }
     }
-  }, [postId]);
+  }, []);
 
-  const handleLikeClickHeart = async () => {
-    try {
-       toast.dismiss(); // Dismiss all existing toasts
-      await axios.post(
-        `${BASE_URL}/likes/add-like/${currentUserId}/${postId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setIsLiked(true);
-      setLikesCount((prev) => prev + 1);
-      fetchLikesStatus(currentUserId);
-      toast.success("Liked successfully!"); // ✅ Toast added here
-    } catch (error) {
-       toast.dismiss();
-      console.error("Error liking post:", error);
-      toast.error("Already Liked Post"); // Optional: show error toast
+  useEffect(() => {
+    if (currentUserId && postId) {
+      fetchLikesStatus();
     }
-  };
+  }, [currentUserId, postId]);
 
-  const fetchLikesStatus = async (uid) => {
+  // ✅ 4. Fetch all likes for post and update state
+
+  const fetchLikesStatus = async () => {
     try {
       const response = await axios.get(
         `${BASE_URL}/likes/all-likes/${postId}`,
@@ -73,12 +61,63 @@ const Post = ({
 
       const likesArray = response.data;
       setLikesCount(likesArray.length);
-      const userLiked = likesArray.some((like) => like.currentUserId === uid);
+
+      const userLiked = likesArray.some(
+        (like) => like.user?.id === currentUserId
+      );
       setIsLiked(userLiked);
     } catch (error) {
       console.error("Error fetching likes:", error);
     }
   };
+
+  // ✅ 3. Like / Unlike toggle
+  const handleLikeClickHeart = async () => {
+    try {
+      toast.dismiss();
+
+      if (isLiked) {
+        await axios.delete(
+          `${BASE_URL}/likes/delete/${currentUserId}/${postId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setIsLiked(false);
+        setLikesCount((prev) => prev - 1);
+      } else {
+        await axios.post(
+          `${BASE_URL}/likes/add-like/${currentUserId}/${postId}`,
+          {},
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setIsLiked(true);
+        setLikesCount((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.error("Error liking/unliking:", error);
+    }
+  };
+  // ✅ 5. Fetch posts
+
+  const fetchPosts = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/all-post`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setPosts(res.data); // ✅ update state
+    } catch (err) {
+      console.error("Error fetching posts:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts(); // load initially
+  }, []);
 
   const handleDelete = async () => {
     if (currentUserId !== postOwnerId) {
@@ -96,7 +135,7 @@ const Post = ({
           },
         }
       );
-      
+
       console.log("Post deleted:", response.data);
       setShowDeletePopup(false);
       window.location.reload();
@@ -175,19 +214,23 @@ const Post = ({
 
         <div className="flex justify-between items-center mt-4">
           <div className="flex space-x-4">
-            <button className="flex items-center space-x-2">
-              <FaHeart
-                onClick={handleLikeClickHeart}
-                className='cursor-pointer text-xl text-pink-600'
-              />
+            <button
+              className="flex items-center space-x-2"
+              onClick={handleLikeClickHeart}
+            >
+              {isLiked ? (
+                <FaHeart className="text-xl text-pink-600" /> // ✅ Liked - pink
+              ) : (
+                <FaRegHeart className="text-xl text-gray-500" /> // ✅ Not liked - gray
+              )}
               <span>{likesCount}</span>
-              <span
-                onClick={() => setShowLikePopup(true)}
-                className="text-gray-700 cursor-pointer"
-              >
-                Show Likes
-              </span>
             </button>
+            <span
+              onClick={() => setShowLikePopup(true)}
+              className="text-gray-700 cursor-pointer"
+            >
+              Show Likes
+            </span>
 
             <button
               className="flex items-center space-x-2 text-blue-400"
@@ -220,19 +263,24 @@ const Post = ({
       {showLikePopup && (
         <LikePopUp onClose={() => setShowLikePopup(false)} postId={postId} />
       )}
+
       {showCommentPopup && (
         <CommentReplyPopup
-          onClose={() => setShowCommentPopup(false)}
           postId={postId}
           currentUserId={currentUserId}
+          onClose={() => setShowCommentPopup(false)}
+          onCommentAdded={() => {
+            fetchPosts(); // ✅ refresh card data
+            setShowCommentPopup(false); // ✅ close comment popup
+          }}
         />
       )}
+
       <ToastContainer
         position="bottom-left"
-        autoClose={3000} // <-- 3 seconds
+        autoClose={3000}
         newestOnTop={false}
         closeOnClick
-        
       />
     </>
   );
@@ -318,9 +366,15 @@ const LikePopUp = ({ onClose, postId }) => {
 };
 
 // COMMENT POPUP
-const CommentReplyPopup = ({ onClose, postId, currentUserId }) => {
+const CommentReplyPopup = ({
+  onClose,
+  postId,
+  currentUserId,
+  onCommentAdded,
+}) => {
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState([]);
+
   const token = localStorage.getItem("token");
 
   const fetchComments = async () => {
@@ -338,19 +392,40 @@ const CommentReplyPopup = ({ onClose, postId, currentUserId }) => {
   };
 
   const handlePostComment = async () => {
-    if (!commentText.trim()) return;
+  if (!commentText.trim()) return;
+
+  try {
+    await axios.post(
+      `${BASE_URL}/comment/add-comment/${currentUserId}/${postId}`,
+      { text: commentText },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    setCommentText("");         // Clear input
+    await fetchComments();      // ✅ Fetch updated comments list
+    onClose();                  // ✅ Close the popup
+  } catch (error) {
+    console.error("Error posting comment:", error);
+  }
+};
+
+
+  const handleDeleteComment = async (commentId) => {
+    if (!commentId) return;
     try {
-      await axios.post(
-        `${BASE_URL}/comment/add-comment/${currentUserId}/${postId}`,
-        { text: commentText },
+      await axios.delete(
+        `${BASE_URL}/comment/delete/${currentUserId}/${postId}/${commentId}`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
-      setCommentText("");
-      fetchComments();
+      fetchComments(); // Refresh comments
     } catch (error) {
-      console.error("Error posting comment:", error);
+      console.error("Error deleting comment:", error);
     }
   };
 
@@ -379,20 +454,22 @@ const CommentReplyPopup = ({ onClose, postId, currentUserId }) => {
                   <img
                     alt="User"
                     className="w-10 h-10 rounded-full"
-                    src={
-                      comment.user?.url ||
-                      comment.url ||
-                      "https://placehold.co/40x40"
-                    }
+                    src={comment.user?.url || "https://placehold.co/40x40"}
                   />
-                  <div>
+                  <div className="flex-1">
                     <p className="text-gray-900 font-semibold">
-                      {comment.user?.username || comment.username || "Unknown"}
+                      {comment.user?.username || "Unknown"}
                     </p>
                     <p className="text-gray-500 text-sm">
                       {JSON.parse(comment.message).text}
                     </p>
                   </div>
+                  <button
+                    onClick={() => handleDeleteComment(comment.commentId)}
+                    className="text-red-500 hover:text-red-700 text-sm"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))

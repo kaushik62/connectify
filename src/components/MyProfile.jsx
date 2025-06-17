@@ -3,11 +3,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Follower_Following_list from "./Follower_Following_list";
 import BASE_URL from "../config";
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 
 const MyProfile = () => {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState(0);
+  const [profile, setProfile] = useState({});
+  const [refreshFlag, setRefreshFlag] = useState(false);
 
   const EditProfile = () => navigate("/edit-my-profile");
   const MyPost = () => navigate("/my-posts");
@@ -15,26 +16,21 @@ const MyProfile = () => {
   const token = localStorage.getItem("token");
   const decoded = jwtDecode(token);
   const userId = decoded.id || decoded._id || decoded.userId;
-  
 
   useEffect(() => {
     axios
-      .get(`${BASE_URL}/auth/profile/${userId}`)
+      .get(`${BASE_URL}/auth/profile/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         setProfile(res.data);
       })
       .catch((err) => {
         console.error("Error fetching profile:", err);
-      }),
-      
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    
-  }, []);
- 
+      });
+  }, [refreshFlag]);
 
   return (
     <aside className="w-1/4 space-y-4">
@@ -87,7 +83,8 @@ const MyProfile = () => {
             My Posts
           </button>
         </div>
-        <Follower_Following_list />
+
+        <Follower_Following_list onChange={() => setRefreshFlag((prev) => !prev)} />
       </div>
     </aside>
   );
