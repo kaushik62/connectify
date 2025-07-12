@@ -18,8 +18,8 @@ const LandingPage = () => {
   const features = [
     {
       id: 1,
-      title: "Adjust Payroll",
-      desc: "Easily create quotes and mark them as accepted or declined.",
+      title: "Create Posts",
+      desc: "Easily create posts like social media.",
       img: "https://storage.googleapis.com/a1aa/image/bACHs4cf18wsco7tQQK0-qL5ncs0ePzanZhguZzXjqk.jpg",
     },
     {
