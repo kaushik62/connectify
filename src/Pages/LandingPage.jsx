@@ -18,8 +18,8 @@ const LandingPage = () => {
   const features = [
     {
       id: 1,
-      title: "Adjust Payroll",
-      desc: "Easily create quotes and mark them as accepted or declined.",
+      title: "Create Posts",
+      desc: "Easily create posts like social media.",
       img: "https://storage.googleapis.com/a1aa/image/bACHs4cf18wsco7tQQK0-qL5ncs0ePzanZhguZzXjqk.jpg",
     },
     {
@@ -30,8 +30,8 @@ const LandingPage = () => {
     },
     {
       id: 3,
-      title: "Payment",
-      desc: "Access anytime, anywhere – perfect for remote teams.",
+      title: "Realtime Messaging",
+      desc: "Access anytime, anywhere.",
       img: "https://storage.googleapis.com/a1aa/image/ikkb_AE6yLOSHuKpa0DG0jdVqk0DlnFBQr5bhKyPnUY.jpg",
     },
     {

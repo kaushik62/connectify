@@ -35,7 +35,7 @@ export default function Messaging() {
 
     setCurrentUser(username);
 
-    const socket = new SockJS(`http://localhost:8080/ws-chat?token=${encodeURIComponent(token)}`);
+    const socket = new SockJS(`${BASE_URL}/ws-chat?token=${encodeURIComponent(token)}`);
     const client = new Client({
       webSocketFactory: () => socket,
       onConnect: () => {
