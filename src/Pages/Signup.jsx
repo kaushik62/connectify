@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import BASE_URL from "../config";
-import { FiEye, FiEyeOff } from "react-icons/fi"; // import eye icons
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -17,11 +17,27 @@ const Signup = () => {
 
   const handleChange = (e) => {
     const { id, value } = e.target;
+
+    // Prevent spaces in username and password
+    if ((id === "username" || id === "password") && /\s/.test(value)) {
+      return;
+    }
+
     setFormData({ ...formData, [id]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Final validation for spaces
+    if (/\s/.test(formData.username)) {
+      alert("Username must not contain spaces.");
+      return;
+    }
+    if (/\s/.test(formData.password)) {
+      alert("Password must not contain spaces.");
+      return;
+    }
 
     try {
       const response = await axios.post(`${BASE_URL}/auth/signup`, formData);
@@ -62,18 +78,21 @@ const Signup = () => {
           <p className="text-gray-500 mb-6">Register your account</p>
 
           <form onSubmit={handleSubmit}>
+            {/* Username */}
             <div className="mb-4">
-              <label className="block text-gray-700" htmlFor="name">Username</label>
+              <label className="block text-gray-700" htmlFor="username">Username</label>
               <input
                 type="text"
                 id="username"
                 value={formData.username}
                 onChange={handleChange}
-                placeholder="Enter your name"
+                placeholder="Enter your username"
                 className="w-full border border-gray-300 rounded-lg p-3 mt-1"
               />
+              <small className="text-red-500">No spaces allowed in username</small>
             </div>
 
+            {/* Email */}
             <div className="mb-4">
               <label className="block text-gray-700" htmlFor="email">Email</label>
               <input
@@ -86,6 +105,7 @@ const Signup = () => {
               />
             </div>
 
+            {/* Password */}
             <div className="mb-6">
               <label className="block text-gray-700" htmlFor="password">Password</label>
               <div className="relative">
@@ -104,20 +124,7 @@ const Signup = () => {
                   {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                 </span>
               </div>
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-gray-700" htmlFor="role">Select Role</label>
-              <select
-                id="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-3 mt-1"
-              >
-                <option value="">Select</option>
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </select>
+              <small className="text-red-500">No spaces allowed in password</small>
             </div>
 
             <button
