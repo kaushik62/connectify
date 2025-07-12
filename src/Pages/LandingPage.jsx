@@ -36,8 +36,8 @@ const LandingPage = () => {
     },
     {
       id: 4,
-      title: "Submission",
-      desc: "Choose plans that fit your needs – all in a few clicks.",
+      title: "Get Notifications",
+      desc: "Never miss an update with timely notifications.",
       img: "https://storage.googleapis.com/a1aa/image/LWKnRKxhRztfXTAqqDUKN7mdj4PQiOtUaSGqd4EM5mA.jpg",
     },
   ];
