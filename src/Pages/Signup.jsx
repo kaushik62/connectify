@@ -89,7 +89,6 @@ const Signup = () => {
                 placeholder="Enter your username"
                 className="w-full border border-gray-300 rounded-lg p-3 mt-1"
               />
-              <small className="text-red-500">No spaces allowed in username</small>
             </div>
 
             {/* Email */}
@@ -124,7 +123,6 @@ const Signup = () => {
                   {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                 </span>
               </div>
-              <small className="text-red-500">No spaces allowed in password</small>
             </div>
 
             <button
