@@ -30,8 +30,8 @@ const LandingPage = () => {
     },
     {
       id: 3,
-      title: "Payment",
-      desc: "Access anytime, anywhere – perfect for remote teams.",
+      title: "Realtime Messaging",
+      desc: "Access anytime, anywhere.",
       img: "https://storage.googleapis.com/a1aa/image/ikkb_AE6yLOSHuKpa0DG0jdVqk0DlnFBQr5bhKyPnUY.jpg",
     },
     {
