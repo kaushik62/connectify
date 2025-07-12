@@ -33,7 +33,7 @@ const MyProfile = () => {
   }, [refreshFlag]);
 
   return (
-    <aside className="w-1/4 space-y-4">
+    <aside className="w-1/4 space-y-4 sticky top-16 h-screen">
       <div className="bg-white p-4 rounded-lg shadow-md">
         <div className="flex items-center space-x-4">
           <img

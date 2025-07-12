@@ -140,16 +140,6 @@ const Footer = () => {
               </li>
               <li>
                 <a href="#" className="hover:text-white transition">
-                  Careers
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition">
-                  Blog
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition">
                   Contact
                 </a>
               </li>
@@ -170,31 +160,9 @@ const Footer = () => {
                   Privacy Policy
                 </a>
               </li>
-              <li>
-                <a href="#" className="hover:text-white transition">
-                  Terms of Service
-                </a>
-              </li>
             </ul>
           </div>
-
-          {/* Newsletter */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Subscribe</h3>
-            <p className="text-purple-200 mb-3 text-sm">
-              Get the latest updates and offers.
-            </p>
-            <form className="flex flex-col space-y-3">
-              <input
-                type="email"
-                placeholder="Your email"
-                className="px-4 py-2 rounded-lg bg-white text-black placeholder-gray-500 outline-none"
-              />
-              <button className="bg-white text-indigo-800 font-semibold py-2 rounded-lg hover:bg-purple-100 transition">
-                Subscribe
-              </button>
-            </form>
-          </div>
+          
         </div>
 
         {/* Footer Bottom */}
