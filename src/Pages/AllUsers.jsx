@@ -99,9 +99,6 @@ const AllUsers = () => {
                 </div>
                 <div className="text-center">
                   <h2 className="font-semibold">{user.username}</h2>
-                  <p className="text-gray-500">{user.noOfPost} Posts</p>
-                  <p className="text-gray-500">{user.noOfFollowers} Followers</p>
-                  <p className="text-gray-500">{user.noOfFollowing} Following</p>
                   <button
                     className="mt-2 px-10 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition"
                     onClick={() => handleFollow(user.id)}

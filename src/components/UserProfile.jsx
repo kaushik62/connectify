@@ -3,10 +3,16 @@ import { X } from "lucide-react";
 import axios from "axios";
 import BASE_URL from "../config";
 import Post from "./Post";
+import { jwtDecode } from "jwt-decode";
 
 const UserProfile = ({ onClose, user }) => {
   const [posts, setPosts] = useState([]);
-  const [currentUserImg, setCurrentUserImg] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [currentUserImg, setCurrentUserImg] = useState("https://placehold.co/40x40");
+
+  const token = localStorage.getItem("token");
+  const decoded = jwtDecode(token);
+  const currentUserId = decoded.id || decoded._id || decoded.userId;
 
   useEffect(() => {
     const fetchUserPosts = async () => {
@@ -15,30 +21,32 @@ const UserProfile = ({ onClose, user }) => {
         setPosts(res.data);
       } catch (error) {
         console.error("Failed to load user posts", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     const fetchCurrentUser = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`${BASE_URL}/auth/me`, {
+        const res = await axios.get(`${BASE_URL}/auth/profile/${currentUserId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCurrentUserImg(res.data.url || "https://placehold.co/40x40");
       } catch (error) {
         console.error("Failed to load current user", error);
-        setCurrentUserImg("https://placehold.co/40x40");
       }
     };
 
-    fetchUserPosts();
+    if (user?.id) {
+      fetchUserPosts();
+    }
     fetchCurrentUser();
   }, [user.id]);
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50">
-      <div className="bg-white w-[94%] max-w-5xl h-[92vh] rounded-2xl shadow-2xl overflow-hidden relative flex flex-col">
-        
+      <div className="bg-white w-[94%] max-w-5xl h-[92vh] rounded-2xl shadow-2xl overflow-hidden relative flex flex-col pt-12">
         {/* Header */}
         <div className="flex justify-between items-center px-6 py-4 border-b bg-white sticky top-0 z-10">
           <div className="flex items-center gap-5">
@@ -72,7 +80,9 @@ const UserProfile = ({ onClose, user }) => {
 
         {/* Posts Section */}
         <div className="px-6 py-4 overflow-y-auto flex-1 bg-gray-50">
-          {posts.length === 0 ? (
+          {loading ? (
+            <p className="text-center text-gray-500 mt-10">Loading posts...</p>
+          ) : posts.length === 0 ? (
             <p className="text-center text-gray-500 mt-10">No posts available</p>
           ) : (
             <div className="space-y-6">
@@ -80,16 +90,16 @@ const UserProfile = ({ onClose, user }) => {
                 <Post
                   key={index}
                   currentUserimg={currentUserImg}
-                  userImg={user.url}
-                  username={user.username}
-                  timeAgo={new Date(post.createdAt).toLocaleString()}
-                  content={post.content || ""}
-                  caption={post.caption || ""}
-                  tags={post.tags || ""}
-                  postImg={post.postUrl}
-                  comments={post.comments?.length || 0}
-                  postId={post._id}
-                  userId={user.id}
+                  userImg={post.user?.url || user.url}
+                  username={post.user?.username || user.username}
+                  timeAgo={new Date(post.time).toLocaleString()}
+                  content={post.topic || ""}
+                  caption={post.postDescription || ""}
+                  tags={""}
+                  postImg={post.postUrl || ""}
+                  comments={post.noOfComments || 0}
+                  postId={post.postId}
+                  userId={post.user?.id || user.id}
                 />
               ))}
             </div>

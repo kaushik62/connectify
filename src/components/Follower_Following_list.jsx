@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import BASE_URL from "../config";
 import { jwtDecode } from "jwt-decode";
+import UserProfile from "./UserProfile";
 
 const Follower_Following_list = ({ onChange }) => {
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [showFollowers, setShowFollowers] = useState(true);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showUserProfile, setShowUserProfile] = useState(false);
 
   const token = localStorage.getItem("token");
   let currentUserId = null;
@@ -105,7 +108,14 @@ const Follower_Following_list = ({ onChange }) => {
               key={user.id || index}
               className="flex justify-between items-center p-4 border-b border-gray-200"
             >
-              <div className="flex items-center">
+              {/* ✅ Clickable user info area */}
+              <div
+                className="flex items-center cursor-pointer"
+                onClick={() => {
+                  setSelectedUser(user);
+                  setShowUserProfile(true);
+                }}
+              >
                 <img
                   src={user.url}
                   alt={`Profile of ${user.username}`}
@@ -119,6 +129,7 @@ const Follower_Following_list = ({ onChange }) => {
                 </div>
               </div>
 
+              {/* Unfollow button */}
               {!showFollowers && (
                 <button
                   onClick={() => handleRemove(index, user.id || user._id)}
@@ -131,6 +142,17 @@ const Follower_Following_list = ({ onChange }) => {
           ))
         )}
       </div>
+
+      {/* ✅ User Profile Popup */}
+      {showUserProfile && selectedUser && (
+        <UserProfile
+          user={selectedUser}
+          onClose={() => {
+            setShowUserProfile(false);
+            setSelectedUser(null);
+          }}
+        />
+      )}
     </div>
   );
 };

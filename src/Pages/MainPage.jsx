@@ -5,8 +5,8 @@ import AllUsers from "./AllUsers";
 import BASE_URL from "../config";
 import Post from "../components/Post";
 import MyProfile from "../components/MyProfile";
-import ShowUserId from "../components/Demo";
 import { jwtDecode } from "jwt-decode";
+import UserProfile from "../components/UserProfile";
 
 //* Share something input
 const ShareSomething = ({ onPostSubmit }) => {
@@ -59,24 +59,27 @@ const ShareSomething = ({ onPostSubmit }) => {
 const Feed = ({ refresh }) => {
   const [posts, setPosts] = useState([]);
   const [profile, setProfile] = useState({});
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showUserProfile, setShowUserProfile] = useState(false);
+
   const token = localStorage.getItem("token");
   const decoded = jwtDecode(token);
   const currentUserId = decoded.id || decoded._id || decoded.userId;
 
-  const fetchPosts = () => {
+  const handleImageClick = (user) => {
+    setSelectedUser(user);
+    setShowUserProfile(true);
+  };
+
+  useEffect(() => {
     axios
       .get(`${BASE_URL}/api/all-post`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
         },
       })
       .then((response) => setPosts(response.data))
       .catch((error) => console.error("Failed to fetch posts:", error));
-  };
-
-  useEffect(() => {
-    fetchPosts();
   }, [refresh]);
 
   useEffect(() => {
@@ -91,26 +94,39 @@ const Feed = ({ refresh }) => {
   }, []);
 
   return (
-    <div className="p-0.5 max-w-3xl mx-auto -mt-3">
-      {posts.map((post, index) => (
-        <div key={index} className="cursor-pointer">
-          <Post
-            userImg={post.user.url}
-            currentUserimg={profile.url}
-            username={post.user.username}
-            timeAgo={post.time}
-            content={post.postDescription}
-            caption={post.topic || ""}
-            tags=""
-            postImg={post.postUrl}
-            likes={post.noOfLikes}
-            comments={post.noOfComments}
-            postId={post.postId}
-            userId={post.user.id}
-          />
-        </div>
-      ))}
-    </div>
+    <>
+      <div className="p-0.5 max-w-3xl mx-auto -mt-3">
+        {posts.map((post, index) => (
+          <div key={index}>
+            <Post
+              userImg={post.user.url}
+              currentUserimg={profile.url}
+              username={post.user.username}
+              timeAgo={post.time}
+              content={post.postDescription}
+              caption={post.topic || ""}
+              tags=""
+              postImg={post.postUrl}
+              likes={post.noOfLikes}
+              comments={post.noOfComments}
+              postId={post.postId}
+              userId={post.user.id}
+              onUserClick={() => handleImageClick(post.user)} // 👈 pass the handler
+            />
+          </div>
+        ))}
+      </div>
+
+      {showUserProfile && selectedUser && (
+        <UserProfile
+          user={selectedUser}
+          onClose={() => {
+            setShowUserProfile(false);
+            setSelectedUser(null);
+          }}
+        />
+      )}
+    </>
   );
 };
 
@@ -124,7 +140,6 @@ const CenterArea = () => {
 
   return (
     <div className="flex-1 space-y-4 mx-4">
-      <ShowUserId />
       <ShareSomething onPostSubmit={handlePostSubmit} />
       <Feed refresh={refresh} />
     </div>
@@ -133,7 +148,7 @@ const CenterArea = () => {
 
 //* Right sidebar
 export const RightSidebar = () => (
-  <aside className="w-1/4 space-y-4 sticky top-16 h-screen">
+  <aside className="w-1/4 space-y-4 top-16 h-screen">
     <div className="bg-white p-4 rounded-lg shadow-md">
       <h3 className="font-bold mb-2">Suggested For You</h3>
       <AllUsers />
@@ -141,10 +156,11 @@ export const RightSidebar = () => (
   </aside>
 );
 
+
 //* MainPage layout
 function MainPage() {
   return (
-    <div className="flex flex-grow p-4 mt-14 bg-gray-100">
+    <div className="flex flex-grow p-4 mt-14 bg-gray-100 sticky top-0">
       <MyProfile />
       <CenterArea />
       <RightSidebar />

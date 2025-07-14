@@ -20,6 +20,7 @@ const Post = ({
   comments,
   postId,
   userId: postOwnerId,
+  onUserClick,
 }) => {
   const [showLikePopup, setShowLikePopup] = useState(false);
   const [showCommentPopup, setShowCommentPopup] = useState(false);
@@ -156,6 +157,7 @@ const Post = ({
               className="rounded-full"
               width="40"
               height="40"
+              onClick={onUserClick}
             />
             <div>
               <h4 className="font-bold">{username}</h4>
@@ -392,25 +394,24 @@ const CommentReplyPopup = ({
   };
 
   const handlePostComment = async () => {
-  if (!commentText.trim()) return;
+    if (!commentText.trim()) return;
 
-  try {
-    await axios.post(
-      `${BASE_URL}/comment/add-comment/${currentUserId}/${postId}`,
-      { text: commentText },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    try {
+      await axios.post(
+        `${BASE_URL}/comment/add-comment/${currentUserId}/${postId}`,
+        { text: commentText },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-    setCommentText("");         // Clear input
-    await fetchComments();      // ✅ Fetch updated comments list
-    onClose();                  // ✅ Close the popup
-  } catch (error) {
-    console.error("Error posting comment:", error);
-  }
-};
-
+      setCommentText(""); // Clear input
+      await fetchComments(); // ✅ Fetch updated comments list
+      onClose(); // ✅ Close the popup
+    } catch (error) {
+      console.error("Error posting comment:", error);
+    }
+  };
 
   const handleDeleteComment = async (commentId) => {
     if (!commentId) return;
