@@ -1,14 +1,16 @@
+// src/components/MyProfile.js
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Follower_Following_list from "./Follower_Following_list";
 import BASE_URL from "../config";
 import { jwtDecode } from "jwt-decode";
+import { useProfileRefresh } from "../context/ProfileRefreshContext";
 
 const MyProfile = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState({});
-  const [refreshFlag, setRefreshFlag] = useState(false);
+  const { refreshFlag } = useProfileRefresh();
 
   const EditProfile = () => navigate("/edit-my-profile");
   const MyPost = () => navigate("/my-posts");
@@ -24,12 +26,8 @@ const MyProfile = () => {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then((res) => {
-        setProfile(res.data);
-      })
-      .catch((err) => {
-        console.error("Error fetching profile:", err);
-      });
+      .then((res) => setProfile(res.data))
+      .catch((err) => console.error("Error fetching profile:", err));
   }, [refreshFlag]);
 
   return (
@@ -84,7 +82,7 @@ const MyProfile = () => {
           </button>
         </div>
 
-        <Follower_Following_list onChange={() => setRefreshFlag((prev) => !prev)} />
+        <Follower_Following_list />
       </div>
     </aside>
   );

@@ -3,7 +3,6 @@ import axios from "axios";
 import Post from "./Post";
 import BASE_URL from "../config";
 import { jwtDecode } from "jwt-decode";
-import { RightSidebar } from "../Pages/MainPage";
 
 const MyPosts = () => {
   const [posts, setPosts] = useState([]);
