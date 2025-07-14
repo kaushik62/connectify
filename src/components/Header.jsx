@@ -13,13 +13,18 @@ function Header() {
 
   const handleLogout = () => {
     localStorage.clear();
-    window.location.reload();
     navigate("/");
+    window.location.reload();
   };
 
   return (
     <header className="container mx-auto px-4 py-2.5 flex items-center bg-white shadow-md fixed top-0 z-50">
-      <div className="text-2xl font-bold ml-2">Connectify</div>
+      <Link
+        to="/"
+        className="text-3xl font-bold ml-7 bg-gradient-to-r from-fuchsia-600 via-pink-500 to-rose-500 text-transparent bg-clip-text py-2"
+      >
+        Connectify
+      </Link>
       <div className="flex items-center space-x-4 justify-evenly flex-grow">
         <nav className="flex space-x-12 text-lg">
           <a
@@ -44,11 +49,6 @@ function Header() {
             <Link to="/notification">Notification</Link>
           </a>
         </nav>
-        <input
-          type="text"
-          placeholder="Search"
-          className="px-9 py-1.5 border rounded-full"
-        />
       </div>
 
       {isLoggedIn && (
