@@ -2,14 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import BASE_URL from "../config";
+import { SendHorizonal } from "lucide-react";
 
 export default function Messaging() {
   const [currentUser, setCurrentUser] = useState("");
-  const [partnerList, setPartnerList] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [currentChatUser, setCurrentChatUser] = useState("");
   const [messages, setMessages] = useState([]);
   const [content, setContent] = useState("");
-  const [manualPartner, setManualPartner] = useState(""); // input field
+  const [isConnected, setIsConnected] = useState(false);
 
   const stompClientRef = useRef(null);
   const subscriptionRef = useRef(null);
@@ -35,30 +36,24 @@ export default function Messaging() {
 
     setCurrentUser(username);
 
+    // Fetch all users
+    fetch(`${BASE_URL}/auth/all-user`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const filtered = data.filter((u) => u.username !== username);
+        setAllUsers(filtered);
+      });
+
+    // WebSocket connection
     const socket = new SockJS(`${BASE_URL}/ws-chat?token=${encodeURIComponent(token)}`);
     const client = new Client({
       webSocketFactory: () => socket,
+      reconnectDelay: 5000,
       onConnect: () => {
+        setIsConnected(true);
         stompClientRef.current = client;
-
-        // Fetch all room IDs (partners)
-        fetch(`${BASE_URL}/api/chat/all-roomid/${username}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            const partners = data
-              .map((room) => room.split("_").find((name) => name !== username))
-              .filter(Boolean);
-            setPartnerList(partners);
-          });
-
-        // Load messages from Shubham_kaushik_gupta_256 (optional preload)
-        fetch(`${BASE_URL}/api/chat/all-content/Shubham_kaushik_gupta_256`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-          .then((res) => res.json())
-          .then((data) => setMessages(data || []));
       },
     });
 
@@ -66,17 +61,12 @@ export default function Messaging() {
   }, []);
 
   const joinChat = (partner) => {
-    const client = stompClientRef.current;
-    if (!client?.connected) {
+    if (!isConnected) {
       alert("WebSocket not connected yet.");
       return;
     }
 
-    if (!partner) {
-      alert("Enter a username to chat with.");
-      return;
-    }
-
+    const client = stompClientRef.current;
     if (subscriptionRef.current) {
       subscriptionRef.current.unsubscribe();
     }
@@ -90,16 +80,11 @@ export default function Messaging() {
       setMessages((prev) => [...prev, parsed]);
     });
 
-    // Fetch message history
     fetch(`${BASE_URL}/api/chat/all-content/${rid}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((res) => res.json())
       .then((data) => setMessages(data || []));
-  };
-
-  const handleManualJoin = () => {
-    joinChat(manualPartner.trim());
   };
 
   const sendMessage = () => {
@@ -116,8 +101,18 @@ export default function Messaging() {
       body: JSON.stringify(message),
     });
 
-    setMessages((prev) => [...prev, { sender: currentUser, content }]);
+    // Optimistic update: only content
+    setMessages((prev) => [...prev, { content: content.trim() }]);
     setContent("");
+  };
+
+  const sanitizeMessage = (text) => {
+    if (!text || typeof text !== "string") return "";
+    const bannedWords = [currentUser.toLowerCase(), currentChatUser.toLowerCase()];
+    const containsName = bannedWords.some((word) =>
+      text.toLowerCase().includes(word)
+    );
+    return containsName && text.length <= 25 ? "" : text;
   };
 
   useEffect(() => {
@@ -125,90 +120,85 @@ export default function Messaging() {
   }, [messages]);
 
   return (
-    <div className="flex h-screen bg-[#f0f2f5]">
+    <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-1/3 bg-white border-r border-gray-300 p-4 overflow-y-auto">
-        <h2 className="text-xl font-bold text-emerald-600 mb-4">💬 Chats</h2>
+      <aside className="w-1/3 bg-white border-r border-gray-200 px-8 py-6 overflow-y-auto shadow-md">
+        <h2 className="text-2xl font-bold text-emerald-600 mb-6">All Users</h2>
 
-        {/* Manual Join Input */}
-        <div className="mb-4">
-          <label className="text-sm text-gray-600">Chat with:</label>
-          <div className="flex mt-1">
-            <input
-              type="text"
-              value={manualPartner}
-              onChange={(e) => setManualPartner(e.target.value)}
-              placeholder="Enter username"
-              className="flex-1 border border-gray-300 px-3 py-1 rounded-l-md text-sm"
-            />
-            <button
-              onClick={handleManualJoin}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 rounded-r-md text-sm"
+        <div className="space-y-3">
+          {allUsers.map((user) => (
+            <div
+              key={user.id}
+              onClick={() => joinChat(user.username)}
+              className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer transition border shadow-sm ${
+                currentChatUser === user.username
+                  ? "bg-emerald-200 border-emerald-400"
+                  : "bg-white hover:bg-emerald-100 border-gray-100"
+              }`}
             >
-              Join
-            </button>
-          </div>
-        </div>
-
-        {/* Partner List */}
-        {partnerList.map((name) => (
-          <div
-            key={name}
-            onClick={() => joinChat(name)}
-            className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-emerald-100 transition ${
-              currentChatUser === name ? "bg-emerald-200" : "bg-white"
-            }`}
-          >
-            <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-white shadow">
-              {name[0]?.toUpperCase()}
+              <img
+                src={user.url}
+                alt={user.username}
+                className="w-10 h-10 rounded-full object-cover border border-gray-300"
+              />
+              <span className="text-gray-800 text-sm font-semibold">
+                {user.username}
+              </span>
             </div>
-            <div className="text-gray-800 font-medium">{name}</div>
-          </div>
-        ))}
+          ))}
+        </div>
       </aside>
 
       {/* Chat Window */}
-      <section className="w-2/3 flex flex-col mt-14">
+      <div className="flex flex-col w-2/3 relative  mt-16">
         {/* Header */}
-        <header className="bg-emerald-600 text-white px-6 py-4 font-semibold text-lg shadow sticky top-0 z-10">
-          {currentChatUser ? `Chat with ${currentChatUser}` : "Select or enter a chat"}
+        <header className="bg-gradient-to-r from-fuchsia-600 via-pink-500 to-rose-500  px-8 py-5 font-semibold text-lg text-white shadow sticky top-0 z-10">
+          {currentChatUser ? `Chat with ${currentChatUser}` : "Select a user to start chatting"}
         </header>
 
         {/* Messages */}
-        <main className="flex-1 px-6 py-4 overflow-y-auto space-y-2 bg-emerald-50">
-          {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`max-w-[70%] px-4 py-2 rounded-xl shadow-sm text-sm ${
-                msg.sender === currentUser
-                  ? "self-end bg-emerald-200 text-right ml-auto"
-                  : "self-start bg-white"
-              }`}
-            >
-              {msg.content}
-            </div>
-          ))}
-          <div ref={messagesEndRef}></div>
+        <main className="flex-1 px-8 py-5 overflow-y-auto space-y-4 bg-emerald-50">
+          {messages.map((msg, idx) => {
+            const isSender = msg.sender === currentUser || msg.sender === undefined;
+            const text = sanitizeMessage(msg.content);
+            return text ? (
+              <div key={idx} className={`flex ${isSender ? "justify-end" : "justify-start"}`}>
+                <div
+                  className={`px-6 py-3 rounded-2xl shadow-sm text-sm break-words max-w-[75%] ${
+                    isSender ? "bg-emerald-200 text-right" : "bg-white text-left"
+                  }`}
+                >
+                  {text}
+                </div>
+              </div>
+            ) : null;
+          })}
+          <div ref={messagesEndRef} />
         </main>
 
         {/* Input */}
-        <footer className="flex items-center gap-3 px-6 py-4 border-t bg-white">
+        <footer className="flex items-center gap-3 px-8 py-5 border-t bg-white shadow-md">
           <input
             type="text"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             placeholder="Type a message..."
-            className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            className="flex-1 border border-gray-300 rounded-full px-5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
           />
           <button
             onClick={sendMessage}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-full font-medium text-sm"
+            disabled={!isConnected || !currentChatUser}
+            className={`p-2 rounded-full ${
+              isConnected && currentChatUser
+                ? "bg-emerald-500 hover:bg-emerald-600"
+                : "bg-gray-300 cursor-not-allowed"
+            } text-white`}
           >
-            Send
+            <SendHorizonal className="w-5 h-5" />
           </button>
         </footer>
-      </section>
+      </div>
     </div>
   );
 }
