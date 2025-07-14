@@ -36,7 +36,6 @@ export default function Messaging() {
 
     setCurrentUser(username);
 
-    // Fetch all users
     fetch(`${BASE_URL}/auth/all-user`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -46,7 +45,6 @@ export default function Messaging() {
         setAllUsers(filtered);
       });
 
-    // WebSocket connection
     const socket = new SockJS(`${BASE_URL}/ws-chat?token=${encodeURIComponent(token)}`);
     const client = new Client({
       webSocketFactory: () => socket,
@@ -54,16 +52,27 @@ export default function Messaging() {
       onConnect: () => {
         setIsConnected(true);
         stompClientRef.current = client;
+
+        const savedChatUser = localStorage.getItem("activeChatUser");
+        if (savedChatUser) {
+          joinChat(savedChatUser, true);
+        }
       },
     });
 
     client.activate();
+
+    return () => {
+      subscriptionRef.current?.unsubscribe();
+      client.deactivate();
+    };
   }, []);
 
-  const joinChat = (partner) => {
-    if (!isConnected) {
-      alert("WebSocket not connected yet.");
-      return;
+  const joinChat = (partner, skipSave = false) => {
+    if (!stompClientRef.current?.connected) return;
+
+    if (!skipSave) {
+      localStorage.setItem("activeChatUser", partner);
     }
 
     const client = stompClientRef.current;
@@ -101,18 +110,7 @@ export default function Messaging() {
       body: JSON.stringify(message),
     });
 
-    // Optimistic update: only content
-    setMessages((prev) => [...prev, { content: content.trim() }]);
     setContent("");
-  };
-
-  const sanitizeMessage = (text) => {
-    if (!text || typeof text !== "string") return "";
-    const bannedWords = [currentUser.toLowerCase(), currentChatUser.toLowerCase()];
-    const containsName = bannedWords.some((word) =>
-      text.toLowerCase().includes(word)
-    );
-    return containsName && text.length <= 25 ? "" : text;
   };
 
   useEffect(() => {
@@ -121,10 +119,8 @@ export default function Messaging() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
       <aside className="w-1/3 bg-white border-r border-gray-200 px-8 py-6 overflow-y-auto shadow-md">
         <h2 className="text-2xl font-bold text-emerald-600 mb-6">All Users</h2>
-
         <div className="space-y-3">
           {allUsers.map((user) => (
             <div
@@ -149,25 +145,13 @@ export default function Messaging() {
         </div>
       </aside>
 
-      {/* Chat Window */}
-      <div className="flex flex-col w-2/3 relative  mt-16">
-        {/* Header */}
-        <header className="bg-gradient-to-r from-fuchsia-600 via-pink-500 to-rose-500  px-8 py-5 font-semibold text-lg text-white shadow sticky top-0 z-10">
-          {currentChatUser ? `Chat with ${currentChatUser}` : "Select a user to start chatting"}
-        </header>
-
-        {/* Messages */}
+      <div className="flex flex-col w-2/3 relative mt-16">
         <main className="flex-1 px-8 py-5 overflow-y-auto space-y-4 bg-emerald-50">
           {messages.map((msg, idx) => {
-            const isSender = msg.sender === currentUser || msg.sender === undefined;
-            const text = sanitizeMessage(msg.content);
+            const text = msg.content;
             return text ? (
-              <div key={idx} className={`flex ${isSender ? "justify-end" : "justify-start"}`}>
-                <div
-                  className={`px-6 py-3 rounded-2xl shadow-sm text-sm break-words max-w-[75%] ${
-                    isSender ? "bg-emerald-200 text-right" : "bg-white text-left"
-                  }`}
-                >
+              <div key={idx} className="flex justify-end">
+                <div className="px-6 py-3 rounded-2xl shadow-sm text-sm break-words max-w-[75%] bg-emerald-200 text-right">
                   {text}
                 </div>
               </div>
@@ -176,7 +160,6 @@ export default function Messaging() {
           <div ref={messagesEndRef} />
         </main>
 
-        {/* Input */}
         <footer className="flex items-center gap-3 px-8 py-5 border-t bg-white shadow-md">
           <input
             type="text"
@@ -187,7 +170,9 @@ export default function Messaging() {
             className="flex-1 border border-gray-300 rounded-full px-5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
           />
           <button
-            onClick={sendMessage}
+            onClick={() => {
+              sendMessage();
+            }}
             disabled={!isConnected || !currentChatUser}
             className={`p-2 rounded-full ${
               isConnected && currentChatUser
