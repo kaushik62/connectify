@@ -7,6 +7,7 @@ import Post from "../components/Post";
 import MyProfile from "../components/MyProfile";
 import { jwtDecode } from "jwt-decode";
 import UserProfile from "../components/UserProfile";
+import { FiArrowUp } from "react-icons/fi"; // Feather up arrow
 
 //* Share something input
 const ShareSomething = ({ onPostSubmit }) => {
@@ -156,14 +157,26 @@ export const RightSidebar = () => (
   </aside>
 );
 
-
 //* MainPage layout
 function MainPage() {
+  const handleClick = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div className="flex flex-grow p-4 mt-14 bg-gray-100 sticky top-0">
       <MyProfile />
       <CenterArea />
       <RightSidebar />
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={handleClick}
+          className="bg-gray-700 text-white w-10 h-10 rounded-full shadow-md hover:bg-gray-800 transition flex items-center justify-center"
+          aria-label="Scroll to top"
+        >
+          <FiArrowUp size={18} />
+        </button>
+      </div>
     </div>
   );
 }
