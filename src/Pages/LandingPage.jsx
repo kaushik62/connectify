@@ -136,9 +136,9 @@ const Footer = () => {
             <ul className="space-y-3 text-purple-200">
               <button
                 onClick={goToCollaborators}
-                className="mt-10 px-12 py-3 bg-white text-indigo-600 text-lg font-semibold rounded-full border border-indigo-600 shadow-md hover:bg-indigo-50 hover:shadow-lg hover:text-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-all duration-300 flex items-center gap-3 mx-auto lg:mx-0"
+                className="mt-10 px-7 py-3 bg-white text-indigo-600 text-md font-semibold rounded-full border border-indigo-600 shadow-md hover:bg-indigo-50 hover:shadow-lg hover:text-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-all duration-300 flex items-center gap-2 mx-auto lg:mx-0"
               >
-                Meet Team
+                Meet Our Team
               </button>
 
               <li>
