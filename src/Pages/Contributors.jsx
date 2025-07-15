@@ -8,7 +8,7 @@ const contributors = [
     name: "Kaushik Gupta",
     photo: "https://res.cloudinary.com/dwvwvzwcv/image/upload/v1752565934/Screenshot_2025-07-10_224307_mi9xtz.png", // Replace with actual image
     description:
-      "Full-stack developer passionate about creating impactful digital experiences.",
+      "Pre-Final Year @IIIT Ranchi - CSE | Full Stack Developer (MERN) | React.js & Node.js | C++",
     linkedin: "https://www.linkedin.com/in/kaushikgupta256/",
   },
   {
@@ -16,7 +16,7 @@ const contributors = [
     name: "Shubham Kumar",
     photo: "https://res.cloudinary.com/dwvwvzwcv/image/upload/v1752566339/Screenshot_2025-07-15_132226_is39su.png", // Replace with actual image
     description:
-      "Creative UI/UX designer crafting visually compelling and user-centered interfaces.",
+      "Pre-Final Year @IIIT Ranchi | Java developer | DevOps | Aws | 200+ DSA problem solved",
     linkedin: "https://www.linkedin.com/in/shubham-kumar-07596728a/",
   },
 ];

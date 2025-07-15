@@ -134,12 +134,11 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-semibold mb-4">Contact us</h3>
             <ul className="space-y-3 text-purple-200">
-
               <button
                 onClick={goToCollaborators}
-                className="mt-8 px-8 py-4 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 flex items-center gap-3 mx-auto lg:mx-0"
+                className="mt-10 px-12 py-3 bg-white text-indigo-600 text-lg font-semibold rounded-full border border-indigo-600 shadow-md hover:bg-indigo-50 hover:shadow-lg hover:text-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-all duration-300 flex items-center gap-3 mx-auto lg:mx-0"
               >
-                Collaborators
+                Meet Team
               </button>
 
               <li>
