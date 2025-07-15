@@ -1,12 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  FaArrowRight,
-  FaFacebookF,
-  FaTwitter,
-  FaInstagram,
-  FaLinkedinIn,
-} from "react-icons/fa";
+import { FaLinkedin } from "react-icons/fa";
+import { FaArrowRight } from "react-icons/fa";
 import socialmedia_image from "../image/socialmedia_img.svg";
 
 const LandingPage = () => {
@@ -19,25 +14,25 @@ const LandingPage = () => {
     {
       id: 1,
       title: "Create Posts",
-      desc: "Easily create posts like social media.",
+      desc: "Share your thoughts, photos, and updates just like on popular social platforms.",
       img: "https://storage.googleapis.com/a1aa/image/bACHs4cf18wsco7tQQK0-qL5ncs0ePzanZhguZzXjqk.jpg",
     },
     {
       id: 2,
-      title: "Review & Confirm",
-      desc: "Sync employee profiles to automate enrolment easily.",
+      title: "Profile Management",
+      desc: "Easily manage your profile and connect with others seamlessly.",
       img: "https://storage.googleapis.com/a1aa/image/7dHnxbqxDi2dItWsq3S-vFFynYYB4w0WLnC96lri8MU.jpg",
     },
     {
       id: 3,
       title: "Realtime Messaging",
-      desc: "Access anytime, anywhere.",
+      desc: "Chat instantly with friends, followers, or groups—anytime, anywhere.",
       img: "https://storage.googleapis.com/a1aa/image/ikkb_AE6yLOSHuKpa0DG0jdVqk0DlnFBQr5bhKyPnUY.jpg",
     },
     {
       id: 4,
-      title: "Get Notifications",
-      desc: "Never miss an update with timely notifications.",
+      title: "Instant Notifications",
+      desc: "Stay updated with likes, comments, messages, and new follower alerts.",
       img: "https://storage.googleapis.com/a1aa/image/LWKnRKxhRztfXTAqqDUKN7mdj4PQiOtUaSGqd4EM5mA.jpg",
     },
   ];
@@ -107,6 +102,12 @@ const LandingPage = () => {
 
 // footer section
 const Footer = () => {
+  const navigate = useNavigate();
+
+  const goToCollaborators = () => {
+    navigate("/contributors");
+  };
+
   return (
     <>
       <footer className="relative bg-gradient-to-br from-indigo-900 to-purple-800 text-white pt-28 pb-10 mt-32 overflow-hidden">
@@ -119,7 +120,7 @@ const Footer = () => {
             <path d="M0,224L48,208C96,192,192,160,288,160C384,160,480,192,576,197.3C672,203,768,181,864,176C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
           </svg>
         </div>
-        
+
         <div className="relative z-10 max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
           <div className="lg:col-span-2">
             <h2 className="text-3xl font-bold mb-4 text-white">Connectify</h2>
@@ -128,60 +129,47 @@ const Footer = () => {
               claims, with a beautiful, easy-to-use interface.
             </p>
           </div>
-          
+
           {/* Company Links */}
           <div>
-            <h3 className="text-xl font-semibold mb-4">Company</h3>
+            <h3 className="text-xl font-semibold mb-4">Contact us</h3>
             <ul className="space-y-3 text-purple-200">
-              <li>
-                <a href="#" className="hover:text-white transition">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition">
-                  Contact
-                </a>
-              </li>
-            </ul>
-          </div>
+              <button
+                onClick={goToCollaborators}
+                className="mt-10 px-7 py-3 bg-white text-indigo-600 text-md font-semibold rounded-full border border-indigo-600 shadow-md hover:bg-indigo-50 hover:shadow-lg hover:text-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-all duration-300 flex items-center gap-2 mx-auto lg:mx-0"
+              >
+                Meet Our Team
+              </button>
 
-          {/* Resources */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Resources</h3>
-            <ul className="space-y-3 text-purple-200">
               <li>
-                <a href="#" className="hover:text-white transition">
-                  Help Center
+                <a
+                  href="https://www.linkedin.com/in/kaushikgupta256/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-2 hover:text-white transition"
+                >
+                  <FaLinkedin className="text-xl" />
+                  <span>Kaushik Gupta</span>
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition">
-                  Privacy Policy
+                <a
+                  href="https://www.linkedin.com/in/shubham-kumar-07596728a/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-2 hover:text-white transition"
+                >
+                  <FaLinkedin className="text-xl" />
+                  <span>Shubham Kumar</span>
                 </a>
               </li>
             </ul>
           </div>
-          
         </div>
 
         {/* Footer Bottom */}
         <div className="relative z-10 border-t border-purple-700 mt-10 pt-6 px-6 flex flex-col lg:flex-row items-center justify-between max-w-7xl mx-auto text-sm text-purple-200">
           <p>© {new Date().getFullYear()} Connectify. All rights reserved.</p>
-          <div className="flex space-x-4 mt-4 lg:mt-0">
-            <a href="#" className="hover:text-white">
-              <FaFacebookF />
-            </a>
-            <a href="#" className="hover:text-white">
-              <FaTwitter />
-            </a>
-            <a href="#" className="hover:text-white">
-              <FaInstagram />
-            </a>
-            <a href="#" className="hover:text-white">
-              <FaLinkedinIn />
-            </a>
-          </div>
         </div>
       </footer>
     </>

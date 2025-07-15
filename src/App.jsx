@@ -13,6 +13,7 @@ import Notifications from "./Pages/Notifications";
 import PostPage from "./Pages/PostPage";
 import Messaging from "./Pages/Messaging";
 import { ProfileRefreshProvider } from "./context/ProfileRefreshContext";
+import Contributors from "./Pages/Contributors";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -40,6 +41,7 @@ function App() {
           {/* Public routes */}
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/contributors" element={<Contributors />} />
 
           {/* Protected routes */}
           <Route path="/edit-my-profile" element={<EditMyProfile />} />
