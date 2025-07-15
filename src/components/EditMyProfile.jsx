@@ -7,7 +7,7 @@ import BASE_URL from "../config";
 const EditMyProfile = () => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false); // ⬅️ New state
+  const [isUpdating, setIsUpdating] = useState(false);
   const [selectedImageFile, setSelectedImageFile] = useState(null);
 
   const [profile, setProfile] = useState({
@@ -38,7 +38,7 @@ const EditMyProfile = () => {
       .catch((err) => {
         console.error("Error fetching profile:", err);
       });
-  }, []);
+  }, [userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,7 +49,7 @@ const EditMyProfile = () => {
     const file = e.target.files[0];
     if (file) {
       setSelectedImageFile(file);
-      setImage(URL.createObjectURL(file)); // preview
+      setImage(URL.createObjectURL(file)); // Preview
     }
   };
 
@@ -69,7 +69,7 @@ const EditMyProfile = () => {
   const toggleEdit = async () => {
     if (isEditing) {
       try {
-        setIsUpdating(true); // ⬅️ Start updatin
+        setIsUpdating(true);
 
         let uploadedImageUrl = image;
         if (selectedImageFile) {
@@ -97,7 +97,7 @@ const EditMyProfile = () => {
       } catch (err) {
         console.error("Error updating profile:", err);
       } finally {
-        setIsUpdating(false); // ⬅️ Done updating
+        setIsUpdating(false);
       }
     } else {
       setIsEditing(true);
@@ -120,7 +120,7 @@ const EditMyProfile = () => {
         <h1 className="text-xl font-semibold mb-6">Profile</h1>
 
         <div className="flex flex-col md:flex-row items-center md:items-start">
-          {/* Profile Image Section */}
+          {/* Profile Image */}
           <div className="mb-6 md:mb-0 md:mr-8 flex flex-col items-center">
             <img
               src={image}
@@ -140,8 +140,8 @@ const EditMyProfile = () => {
             )}
           </div>
 
-          {/* Profile Details */}
-          <div className="flex-1">
+          {/* Profile Info */}
+          <div className="flex-1 w-full">
             <div className="mb-4">
               <span className="block text-gray-600 font-semibold">
                 UserName:
@@ -189,7 +189,6 @@ const EditMyProfile = () => {
               )}
             </div>
 
-            {/* "Updating..." text */}
             {isUpdating && (
               <p className="text-blue-500 mb-3 font-semibold">Updating...</p>
             )}
@@ -198,7 +197,9 @@ const EditMyProfile = () => {
               onClick={toggleEdit}
               disabled={isUpdating}
               className={`border-2 ${
-                isUpdating ? "border-gray-400 text-gray-500" : "border-blue-500 text-blue-900"
+                isUpdating
+                  ? "border-gray-400 text-gray-500"
+                  : "border-blue-500 text-blue-900"
               } rounded-lg px-7 py-2 flex items-center hover:bg-blue-100 transition duration-200`}
             >
               <i className="fas fa-edit mr-5"></i>
