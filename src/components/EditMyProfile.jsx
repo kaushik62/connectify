@@ -104,6 +104,29 @@ const EditMyProfile = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`${BASE_URL}/auth/delete/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      localStorage.removeItem("token");
+      alert("Account deleted successfully.");
+      navigate("/");
+      window.location.reload();
+    } catch (err) {
+      console.error("Error deleting account:", err);
+      alert("Failed to delete account. Please try again.");
+    }
+  };
+
   const handleClose = () => navigate("/");
 
   return (
@@ -205,7 +228,16 @@ const EditMyProfile = () => {
               <i className="fas fa-edit mr-5"></i>
               {isEditing ? "SAVE PROFILE" : "EDIT PROFILE"}
             </button>
+            
           </div>
+          {/* Delete Account Button */}
+            <button
+              onClick={handleDeleteAccount}
+              disabled={isUpdating}
+              className="mt-6 bg-white text-red-600 border border-red-600 rounded-lg px-6 py-2 hover:bg-red-50 hover:text-red-700 transition duration-200"
+            >
+              Delete Account
+            </button>
         </div>
       </div>
     </div>
