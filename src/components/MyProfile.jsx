@@ -52,7 +52,7 @@ const MyProfile = () => {
 
             <h2 className="font-bold text-lg">{profile.username}</h2>
             <p className="text-sm text-gray-600 mt-1">
-              {profile.userBio || "Full Stack Developer | 🎨 UI/UX Enthusiast"}
+              {profile.userBio}
             </p>
           </div>
         </div>

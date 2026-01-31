@@ -7,6 +7,7 @@ import { jwtDecode } from "jwt-decode";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaHeart, FaRegHeart, FaComment } from "react-icons/fa";
+import { User } from "lucide-react"; // or any icon lib
 
 const Post = ({
   currentUserimg,
@@ -151,14 +152,22 @@ const Post = ({
       <div className="bg-white p-4 rounded-lg shadow-md mb-6">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <img
-              src={userImg}
-              alt="User"
-              className="rounded-full"
-              width="40"
-              height="40"
-              onClick={onUserClick}
-            />
+            {userImg ? (
+              <img
+                src={userImg}
+                alt="User"
+                className="w-10 h-10 rounded-full object-cover cursor-pointer"
+                onClick={onUserClick}
+              />
+            ) : (
+              <div
+                onClick={onUserClick}
+                className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer"
+              >
+                <User className="w-5 h-5 text-gray-500" />
+              </div>
+            )}
+
             <div>
               <h4 className="font-bold">{username}</h4>
               <p className="text-gray-500 text-sm">{timeAgo.split("T")[0]}</p>
@@ -246,13 +255,18 @@ const Post = ({
         </div>
 
         <div className="mt-4 flex items-center space-x-4">
-          <img
-            src={currentUserimg}
-            alt="User"
-            className="rounded-full"
-            width="40"
-            height="40"
-          />
+          {currentUserimg ? (
+            <img
+              src={currentUserimg}
+              alt="User"
+              className="w-10 h-10 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+              <User className="w-5 h-5 text-gray-500" />
+            </div>
+          )}
+
           <input
             type="text"
             placeholder="Write your comment"
@@ -452,11 +466,18 @@ const CommentReplyPopup = ({
                 className="flex flex-col space-y-4 mb-4 last:mb-0"
               >
                 <div className="flex items-center space-x-4">
-                  <img
-                    alt="User"
-                    className="w-10 h-10 rounded-full"
-                    src={comment.user?.url || "https://placehold.co/40x40"}
-                  />
+                  {comment.user?.url ? (
+                    <img
+                      src={comment.user.url}
+                      alt="User"
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                      <User className="w-5 h-5 text-gray-500" />
+                    </div>
+                  )}
+
                   <div className="flex-1">
                     <p className="text-gray-900 font-semibold">
                       {comment.user?.username || "Unknown"}
