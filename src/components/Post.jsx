@@ -57,14 +57,14 @@ const Post = ({
         `${BASE_URL}/likes/all-likes/${postId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       const likesArray = response.data;
       setLikesCount(likesArray.length);
 
       const userLiked = likesArray.some(
-        (like) => like.user?.id === currentUserId
+        (like) => like.user?.id === currentUserId,
       );
       setIsLiked(userLiked);
     } catch (error) {
@@ -82,7 +82,7 @@ const Post = ({
           `${BASE_URL}/likes/delete/${currentUserId}/${postId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
         setIsLiked(false);
         setLikesCount((prev) => prev - 1);
@@ -92,7 +92,7 @@ const Post = ({
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
         setIsLiked(true);
         setLikesCount((prev) => prev + 1);
@@ -134,7 +134,7 @@ const Post = ({
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       console.log("Post deleted:", response.data);
@@ -161,7 +161,7 @@ const Post = ({
             />
             <div>
               <h4 className="font-bold">{username}</h4>
-              <p className="text-gray-500 text-sm">{timeAgo}</p>
+              <p className="text-gray-500 text-sm">{timeAgo.split("T")[0]}</p>
             </div>
           </div>
           <button className="text-gray-500">
@@ -300,7 +300,7 @@ const LikePopUp = ({ onClose, postId }) => {
           `${BASE_URL}/likes/all-likes/${postId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
         setLikes(response.data);
       } catch (error) {
@@ -372,7 +372,7 @@ const CommentReplyPopup = ({
   onClose,
   postId,
   currentUserId,
-  onCommentAdded,
+  // onCommentAdded,
 }) => {
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState([]);
@@ -385,7 +385,7 @@ const CommentReplyPopup = ({
         `${BASE_URL}/comment/all-comments/${postId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       setComments(response.data);
     } catch (error) {
@@ -402,7 +402,7 @@ const CommentReplyPopup = ({
         { text: commentText },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       setCommentText(""); // Clear input
@@ -422,7 +422,7 @@ const CommentReplyPopup = ({
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       fetchComments(); // Refresh comments
     } catch (error) {

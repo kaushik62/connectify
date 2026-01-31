@@ -3,6 +3,7 @@ import { X, Image, Trash2 } from "lucide-react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import BASE_URL from "../config";
+import { User } from "lucide-react"; // or any icon lib
 
 const SharePost = ({ onClose, onPostSubmit }) => {
   const [postText, setPostText] = useState("");
@@ -47,7 +48,7 @@ const SharePost = ({ onClose, onPostSubmit }) => {
 
     const res = await axios.post(
       "https://api.cloudinary.com/v1_1/dwvwvzwcv/image/upload",
-      formData
+      formData,
     );
     return res.data.secure_url;
   };
@@ -104,11 +105,18 @@ const SharePost = ({ onClose, onPostSubmit }) => {
         {/* Header */}
         <div className="flex justify-between items-center border-b pb-4">
           <div className="flex items-center gap-3">
-            <img
-              src={profile.url}
-              alt="Profile"
-              className="w-12 h-12 rounded-full"
-            />
+            {profile?.url ? (
+              <img
+                src={profile.url}
+                alt="Profile"
+                className="w-12 h-12 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                <User className="w-6 h-6 text-gray-500" />
+              </div>
+            )}
+
             <p className="font-semibold text-xl">{profile.username}</p>
           </div>
           <button

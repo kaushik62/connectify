@@ -4,11 +4,14 @@ import axios from "axios";
 import BASE_URL from "../config";
 import Post from "./Post";
 import { jwtDecode } from "jwt-decode";
+import { User } from "lucide-react"; // or any icon lib
 
 const UserProfile = ({ onClose, user }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentUserImg, setCurrentUserImg] = useState("https://placehold.co/40x40");
+  const [currentUserImg, setCurrentUserImg] = useState(
+    "https://placehold.co/40x40",
+  );
 
   const token = localStorage.getItem("token");
   const decoded = jwtDecode(token);
@@ -29,9 +32,12 @@ const UserProfile = ({ onClose, user }) => {
     const fetchCurrentUser = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`${BASE_URL}/auth/profile/${currentUserId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          `${BASE_URL}/auth/profile/${currentUserId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
         setCurrentUserImg(res.data.url || "https://placehold.co/40x40");
       } catch (error) {
         console.error("Failed to load current user", error);
@@ -50,22 +56,40 @@ const UserProfile = ({ onClose, user }) => {
         {/* Header */}
         <div className="flex justify-between items-center px-6 py-4 border-b bg-white sticky top-0 z-10">
           <div className="flex items-center gap-5">
-            <img
-              src={user.url}
-              alt="Profile"
-              className="w-20 h-20 rounded-full object-cover border-4 border-blue-500 shadow"
-            />
+            {user?.url ? (
+              <img
+                src={user.url}
+                alt="Profile"
+                className="w-12 h-12 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                <User className="w-6 h-6 text-gray-500" />
+              </div>
+            )}
+
             <div>
-              <p className="font-bold text-2xl text-gray-800">{user.username}</p>
+              <p className="font-bold text-2xl text-gray-800">
+                {user.username}
+              </p>
               <div className="flex gap-8 text-sm text-gray-600 mt-1 font-medium">
                 <span>
-                  <span className="text-gray-900 font-semibold">{user.noOfPost}</span> Posts
+                  <span className="text-gray-900 font-semibold">
+                    {user.noOfPost}
+                  </span>{" "}
+                  Posts
                 </span>
                 <span>
-                  <span className="text-gray-900 font-semibold">{user.noOfFollowers}</span> Followers
+                  <span className="text-gray-900 font-semibold">
+                    {user.noOfFollowers}
+                  </span>{" "}
+                  Followers
                 </span>
                 <span>
-                  <span className="text-gray-900 font-semibold">{user.noOfFollowing}</span> Following
+                  <span className="text-gray-900 font-semibold">
+                    {user.noOfFollowing}
+                  </span>{" "}
+                  Following
                 </span>
               </div>
             </div>
@@ -83,7 +107,9 @@ const UserProfile = ({ onClose, user }) => {
           {loading ? (
             <p className="text-center text-gray-500 mt-10">Loading posts...</p>
           ) : posts.length === 0 ? (
-            <p className="text-center text-gray-500 mt-10">No posts available</p>
+            <p className="text-center text-gray-500 mt-10">
+              No posts available
+            </p>
           ) : (
             <div className="space-y-6">
               {posts.map((post, index) => (

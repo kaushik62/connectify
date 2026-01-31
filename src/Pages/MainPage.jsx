@@ -8,6 +8,8 @@ import MyProfile from "../components/MyProfile";
 import { jwtDecode } from "jwt-decode";
 import UserProfile from "../components/UserProfile";
 import { FiArrowUp } from "react-icons/fi"; // Feather up arrow
+import { User } from "lucide-react"; // or any icon lib
+
 
 //* Share something input
 const ShareSomething = ({ onPostSubmit }) => {
@@ -30,13 +32,19 @@ const ShareSomething = ({ onPostSubmit }) => {
     <>
       <div className="bg-white p-4 rounded-lg shadow-md">
         <div className="flex items-center space-x-4">
-          <img
-            src={profile.url}
-            alt="User profile"
-            className="rounded-full"
-            width="40"
-            height="40"
-          />
+          <div className="flex items-center gap-3">
+  {profile?.url ? (
+    <img
+      src={profile.url}
+      alt="Profile"
+      className="w-12 h-12 rounded-full object-cover"
+    />
+  ) : (
+    <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+      <User className="w-6 h-6 text-gray-500" />
+    </div>
+  )}
+</div>
           <input
             type="text"
             placeholder="Share something..."

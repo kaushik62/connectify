@@ -3,6 +3,7 @@ import axios from "axios";
 import BASE_URL from "../config";
 import { jwtDecode } from "jwt-decode";
 import UserProfile from "./UserProfile";
+import { User } from "lucide-react"; // or any icon lib
 
 const Follower_Following_list = ({ onChange }) => {
   const [followers, setFollowers] = useState([]);
@@ -52,7 +53,7 @@ const Follower_Following_list = ({ onChange }) => {
         `${BASE_URL}/api/unfollow?fromUserId=${currentUserId}&toUserId=${toUserId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       const updated = [...following];
@@ -116,11 +117,18 @@ const Follower_Following_list = ({ onChange }) => {
                   setShowUserProfile(true);
                 }}
               >
-                <img
-                  src={user.url}
-                  alt={`Profile of ${user.username}`}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
+                {user?.url ? (
+                  <img
+                    src={user.url}
+                    alt="Profile"
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                    <User className="w-6 h-6 text-gray-500" />
+                  </div>
+                )}
+
                 <div className="ml-4">
                   <div className="text-lg font-semibold">{user.username}</div>
                   {user.userBio && (

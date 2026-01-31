@@ -6,6 +6,7 @@ import Follower_Following_list from "./Follower_Following_list";
 import BASE_URL from "../config";
 import { jwtDecode } from "jwt-decode";
 import { useProfileRefresh } from "../context/ProfileRefreshContext";
+import { User } from "lucide-react"; // or any icon lib
 
 const MyProfile = () => {
   const navigate = useNavigate();
@@ -34,17 +35,21 @@ const MyProfile = () => {
     <aside className="w-1/4 space-y-4 sticky top-16 h-screen z-10">
       <div className="bg-white p-4 rounded-lg shadow-md">
         <div className="flex items-center space-x-4">
-          <img
-            src={
-              profile.url ||
-              "https://storage.googleapis.com/a1aa/image/8zMD2lsqC41lw0Qs_ujUsrIWhK2qQDqKKH_MmxB1V5Y.jpg"
-            }
-            alt="User profile"
-            className="rounded-full"
-            width="90"
-            height="90"
-          />
           <div>
+            <div className="flex items-center space-x-4">
+              {profile?.url ? (
+                <img
+                  src={profile.url}
+                  alt="User profile"
+                  className="rounded-full w-[90px] h-[90px] object-cover"
+                />
+              ) : (
+                <div className="w-[90px] h-[90px] rounded-full bg-gray-200 flex items-center justify-center">
+                  <User className="w-10 h-10 text-gray-500" />
+                </div>
+              )}
+            </div>
+
             <h2 className="font-bold text-lg">{profile.username}</h2>
             <p className="text-sm text-gray-600 mt-1">
               {profile.userBio || "Full Stack Developer | 🎨 UI/UX Enthusiast"}

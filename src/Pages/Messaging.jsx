@@ -3,6 +3,7 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import BASE_URL from "../config";
 import { SendHorizonal } from "lucide-react";
+import { User } from "lucide-react"; // or any icon lib
 
 export default function Messaging() {
   const [currentUser, setCurrentUser] = useState("");
@@ -34,14 +35,18 @@ export default function Messaging() {
       .then((res) => res.json())
       .then((data) => {
         const cleaned = data.filter(
-          (msg) => msg.content?.trim() !== msg.sender && msg.content?.trim() !== msg.recipient
+          (msg) =>
+            msg.content?.trim() !== msg.sender &&
+            msg.content?.trim() !== msg.recipient,
         );
         setMessages(cleaned);
       });
   };
 
   const initializeWebSocket = (username, token, users) => {
-    const socket = new SockJS(`${BASE_URL}/ws-chat?token=${encodeURIComponent(token)}`);
+    const socket = new SockJS(
+      `${BASE_URL}/ws-chat?token=${encodeURIComponent(token)}`,
+    );
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
@@ -54,7 +59,12 @@ export default function Messaging() {
           const sub = client.subscribe(`/topic/chat/${rid}`, (msg) => {
             const parsed = JSON.parse(msg.body);
             const trimmed = parsed.content?.trim();
-            if (!trimmed || trimmed === parsed.sender || trimmed === parsed.recipient) return;
+            if (
+              !trimmed ||
+              trimmed === parsed.sender ||
+              trimmed === parsed.recipient
+            )
+              return;
             if (currentRoomId.current === rid) {
               refreshMessages(rid);
             }
@@ -143,11 +153,18 @@ export default function Messaging() {
                   : "bg-white hover:bg-emerald-100 border-gray-100"
               }`}
             >
-              <img
-                src={user.url}
-                alt="User"
-                className="w-10 h-10 rounded-full object-cover border"
-              />
+              {user?.url ? (
+                <img
+                  src={user.url}
+                  alt="Profile"
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                  <User className="w-6 h-6 text-gray-500" />
+                </div>
+              )}
+
               <span className="text-gray-800 text-sm font-semibold">
                 {user.username}
               </span>
@@ -167,7 +184,8 @@ export default function Messaging() {
         >
           {messages.map((msg, idx) => {
             const trimmed = msg.content?.trim();
-            if (!trimmed || trimmed === msg.sender || trimmed === msg.recipient) return null;
+            if (!trimmed || trimmed === msg.sender || trimmed === msg.recipient)
+              return null;
             const isSender = msg.sender === currentUser;
             return (
               <div
@@ -176,7 +194,9 @@ export default function Messaging() {
               >
                 <div
                   className={`px-6 py-3 rounded-2xl shadow-sm text-sm break-words max-w-[75%] ${
-                    isSender ? "bg-emerald-200 text-right" : "bg-white text-left"
+                    isSender
+                      ? "bg-emerald-200 text-right"
+                      : "bg-white text-left"
                   }`}
                 >
                   {msg.content}
